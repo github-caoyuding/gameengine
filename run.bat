@@ -1,12 +1,12 @@
 @echo off
-REM Windows 运行脚本
+REM Windows run script
 
-REM 设置控制台为UTF-8编码
+REM Set console to UTF-8 encoding
 chcp 65001 >nul
 
-REM 检查是否已编译
+REM Check if compiled
 if not exist bin (
-    echo 项目尚未编译，正在编译...
+    echo Project not compiled yet, compiling...
     call compile.bat
     if errorlevel 1 (
         pause
@@ -14,12 +14,12 @@ if not exist bin (
     )
 )
 
-echo 启动游戏...
+echo Starting game...
 echo.
 
-REM 运行游戏，指定UTF-8编码
+REM Run game with UTF-8 encoding
 java -Dfile.encoding=UTF-8 -cp bin com.textadventure.game.DemoGame
 
-REM 游戏结束后暂停，防止窗口关闭
+REM Pause after game ends to prevent window from closing
 echo.
 pause
