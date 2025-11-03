@@ -1,7 +1,9 @@
 package com.textadventure.core;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 玩家类，表示游戏中的玩家
@@ -11,6 +13,7 @@ public class Player {
     private Room currentRoom;
     private List<Item> inventory;
     private int maxInventorySize;
+    private Set<Room> visitedRooms;
 
     public Player(String name) {
         this(name, 10);
@@ -20,6 +23,7 @@ public class Player {
         this.name = name;
         this.inventory = new ArrayList<>();
         this.maxInventorySize = maxInventorySize;
+        this.visitedRooms = new HashSet<>();
     }
 
     public String getName() {
@@ -32,6 +36,9 @@ public class Player {
 
     public void setCurrentRoom(Room room) {
         this.currentRoom = room;
+        if (room != null) {
+            visitedRooms.add(room);
+        }
     }
 
     /**
@@ -78,8 +85,30 @@ public class Player {
         Room nextRoom = currentRoom.getExit(direction);
         if (nextRoom != null) {
             currentRoom = nextRoom;
+            visitedRooms.add(currentRoom);
             return true;
         }
         return false;
+    }
+
+    /**
+     * 获取已访问的房间数量
+     */
+    public int getVisitedRoomsCount() {
+        return visitedRooms.size();
+    }
+
+    /**
+     * 获取所有已访问的房间
+     */
+    public Set<Room> getVisitedRooms() {
+        return new HashSet<>(visitedRooms);
+    }
+
+    /**
+     * 检查是否访问过某个房间
+     */
+    public boolean hasVisited(Room room) {
+        return visitedRooms.contains(room);
     }
 }

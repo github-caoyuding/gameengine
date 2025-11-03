@@ -2,6 +2,7 @@ package com.textadventure.game;
 
 import com.textadventure.core.*;
 import com.textadventure.engine.GameEngine;
+import com.textadventure.engine.WinCondition;
 
 /**
  * 示例游戏 - 神秘洞穴探险
@@ -16,8 +17,16 @@ public class DemoGame {
         Player player = new Player("冒险家");
         player.setCurrentRoom(entrance);
 
+        // 创建并设置胜利条件
+        WinCondition winCondition = new WinCondition();
+        winCondition.setRequiredRoomCount(5);  // 探索所有5个房间
+        winCondition.addRequiredItem("王冠");     // 宝藏室的宝物
+        winCondition.addRequiredItem("水晶");     // 地下花园的水晶
+        winCondition.addRequiredItem("钥匙");     // 黑暗密室的钥匙
+
         // 启动游戏引擎
         GameEngine engine = new GameEngine(player);
+        engine.setWinCondition(winCondition);
         engine.start();
     }
 

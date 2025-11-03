@@ -11,11 +11,27 @@ public class GameEngine {
     private Player player;
     private boolean running;
     private Scanner scanner;
+    private WinCondition winCondition;
 
     public GameEngine(Player player) {
         this.player = player;
         this.running = false;
         this.scanner = new Scanner(System.in);
+        this.winCondition = new WinCondition();
+    }
+
+    /**
+     * 设置胜利条件
+     */
+    public void setWinCondition(WinCondition winCondition) {
+        this.winCondition = winCondition;
+    }
+
+    /**
+     * 获取胜利条件
+     */
+    public WinCondition getWinCondition() {
+        return winCondition;
     }
 
     /**
@@ -32,6 +48,12 @@ public class GameEngine {
 
             if (command != null) {
                 processCommand(command);
+
+                // 检查胜利条件
+                if (running && winCondition != null && winCondition.checkWinCondition(player)) {
+                    printVictory();
+                    running = false;
+                }
             }
         }
 
@@ -45,6 +67,11 @@ public class GameEngine {
         System.out.println("==========================================");
         System.out.println("    欢迎来到文本冒险游戏引擎！");
         System.out.println("==========================================");
+
+        if (winCondition != null) {
+            System.out.println(winCondition.getDescription());
+        }
+
         System.out.println("\n输入 'help' 查看可用命令");
         System.out.println("\n" + player.getCurrentRoom().getFullDescription());
     }
@@ -122,6 +149,12 @@ public class GameEngine {
                 quit();
                 break;
 
+            case "progress":
+            case "进度":
+            case "任务":
+                showProgress();
+                break;
+
             default:
                 System.out.println("我不明白这个命令。输入 'help' 查看可用命令。");
         }
@@ -139,6 +172,7 @@ public class GameEngine {
         System.out.println("  drop/丢弃 <物品>     - 丢弃物品");
         System.out.println("  inventory/背包 (i)   - 查看背包");
         System.out.println("  examine/检查 <物品>  - 检查物品");
+        System.out.println("  progress/进度/任务   - 查看任务进度");
         System.out.println("  help/帮助            - 显示此帮助");
         System.out.println("  quit/退出            - 退出游戏");
     }
@@ -269,5 +303,31 @@ public class GameEngine {
     private void quit() {
         System.out.println("\n感谢游玩！再见！");
         running = false;
+    }
+
+    /**
+     * 显示任务进度
+     */
+    private void showProgress() {
+        if (winCondition != null) {
+            System.out.println(winCondition.getProgress(player));
+        } else {
+            System.out.println("\n当前游戏没有设定任务目标。");
+        }
+    }
+
+    /**
+     * 打印胜利信息
+     */
+    private void printVictory() {
+        System.out.println("\n");
+        System.out.println("╔══════════════════════════════════════╗");
+        System.out.println("║                                      ║");
+        System.out.println("║          🎉 恭喜你获胜了！ 🎉          ║");
+        System.out.println("║                                      ║");
+        System.out.println("║   你已经完成了所有任务目标！          ║");
+        System.out.println("║                                      ║");
+        System.out.println("╚══════════════════════════════════════╝");
+        System.out.println("\n感谢游玩！");
     }
 }
