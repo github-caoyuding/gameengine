@@ -17,5 +17,8 @@ if %errorlevel% equ 0 (
     echo 运行: run.bat
 ) else (
     echo 编译失败！
+    pause
     exit /b 1
 )
+
+pause
