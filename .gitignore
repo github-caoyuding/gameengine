@@ -1,0 +1,18 @@
+# 编译输出
+bin/
+*.class
+
+# IDE 相关
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# 操作系统相关
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
