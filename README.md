@@ -231,6 +231,56 @@ public class MyGame {
 - 字符串处理
 - 包管理
 
+## Windows 常见问题
+
+### 中文乱码问题
+
+如果在Windows系统上运行游戏时出现中文乱码，请按以下步骤解决：
+
+**方案1：使用提供的脚本（推荐）**
+
+直接运行 `run.bat`，脚本已经自动配置了UTF-8编码。
+
+**方案2：手动设置编码**
+
+如果仍有问题，请在命令行中执行：
+
+```cmd
+# 设置控制台为UTF-8编码
+chcp 65001
+
+# 编译（指定UTF-8编码）
+javac -encoding UTF-8 -d bin -sourcepath src src\com\textadventure\game\DemoGame.java
+
+# 运行（指定UTF-8编码）
+java -Dfile.encoding=UTF-8 -cp bin com.textadventure.game.DemoGame
+```
+
+**方案3：使用Windows Terminal**
+
+推荐使用 Windows Terminal（Windows 10/11自带），它对UTF-8支持更好：
+1. 打开 Windows Terminal
+2. 运行 `run.bat`
+
+**方案4：修改控制台字体**
+
+如果使用传统cmd，请：
+1. 右键点击cmd窗口标题栏
+2. 选择"属性" → "字体"
+3. 选择支持中文的字体（如"新宋体"或"Microsoft YaHei Mono"）
+
+### PowerShell 用户
+
+如果使用PowerShell，可以直接运行：
+
+```powershell
+# 设置输出编码
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+# 运行游戏
+.\run.bat
+```
+
 ## 许可证
 
 本项目为教育目的创建，可以自由使用和修改。
