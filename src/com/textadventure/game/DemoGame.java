@@ -2,6 +2,7 @@ package com.textadventure.game;
 
 import com.textadventure.core.*;
 import com.textadventure.engine.GameEngine;
+import com.textadventure.engine.LoginService;
 import com.textadventure.engine.WinCondition;
 
 /**
@@ -10,11 +11,21 @@ import com.textadventure.engine.WinCondition;
 public class DemoGame {
 
     public static void main(String[] args) {
+        // 用户登录
+        LoginService loginService = new LoginService();
+        User user = loginService.showLoginMenu();
+
+        // 如果用户选择退出，直接结束程序
+        if (user == null) {
+            return;
+        }
+
         // 创建游戏世界
         Room entrance = createGameWorld();
 
-        // 创建玩家
-        Player player = new Player("冒险家");
+        // 创建玩家（使用登录用户的昵称）
+        String playerName = user.getNickname() != null ? user.getNickname() : user.getUsername();
+        Player player = new Player(playerName);
         player.setCurrentRoom(entrance);
 
         // 创建并设置胜利条件

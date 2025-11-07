@@ -5,11 +5,14 @@
 ## 特性
 
 - 🎮 完整的游戏引擎系统
+- 🔐 用户登录系统，支持注册、登录、游客模式
+- 💾 JDBC数据库集成，支持MySQL/PostgreSQL/SQLite
 - 🗺️ 房间系统，支持多方向连接
 - 🎒 物品系统，可拾取和丢弃物品
 - 💬 命令解析器，支持中英文命令
+- 🏆 胜利条件系统，任务进度追踪
 - 🎯 面向对象设计，易于扩展
-- 📦 纯 Java SE，无需额外依赖
+- 📦 基于 Java SE + JDBC
 
 ## 项目结构
 
@@ -22,12 +25,24 @@ gameengine/
 │           │   ├── Direction.java    # 方向枚举
 │           │   ├── Item.java         # 物品类
 │           │   ├── Player.java       # 玩家类
-│           │   └── Room.java         # 房间类
+│           │   ├── Room.java         # 房间类
+│           │   └── User.java         # 用户实体类
+│           ├── database/       # 数据库层
+│           │   ├── DBUtil.java       # JDBC工具类
+│           │   └── UserDAO.java      # 用户数据访问对象
 │           ├── engine/         # 游戏引擎
 │           │   ├── Command.java      # 命令类
-│           │   └── GameEngine.java   # 游戏引擎
+│           │   ├── GameEngine.java   # 游戏引擎
+│           │   ├── LoginService.java # 登录服务
+│           │   └── WinCondition.java # 胜利条件
 │           └── game/           # 游戏实现
 │               └── DemoGame.java     # 示例游戏
+├── resources/                  # 资源文件
+│   └── db.properties           # 数据库配置
+├── sql/                        # SQL脚本
+│   ├── init.sql                # MySQL初始化脚本
+│   ├── init_sqlite.sql         # SQLite初始化脚本
+│   └── README.md               # 数据库设置说明
 ├── bin/                        # 编译输出目录
 ├── compile.sh                  # Linux/Mac 编译脚本
 ├── run.sh                      # Linux/Mac 运行脚本
@@ -41,6 +56,58 @@ gameengine/
 ### 前置要求
 
 - Java JDK 8 或更高版本
+- (可选) 数据库服务器：MySQL 5.7+ / PostgreSQL 9.6+ / SQLite 3+
+- (可选) 相应的 JDBC 驱动包
+
+### 数据库配置（可选）
+
+游戏支持三种运行模式：
+
+**1. 游客模式（无需数据库）**
+- 直接运行游戏，选择"Guest Mode"即可游玩
+- 不需要任何数据库配置
+
+**2. 数据库模式（推荐）**
+
+如果要使用登录注册功能，需要配置数据库：
+
+**步骤1：初始化数据库**
+
+```bash
+# MySQL
+mysql -u root -p < sql/init.sql
+
+# SQLite (最简单)
+sqlite3 gameengine.db < sql/init_sqlite.sql
+```
+
+**步骤2：配置数据库连接**
+
+编辑 `resources/db.properties` 文件：
+
+```properties
+# MySQL 示例
+db.url=jdbc:mysql://localhost:3306/gameengine
+db.username=root
+db.password=your_password
+db.driver=com.mysql.cj.jdbc.Driver
+
+# 或 SQLite 示例（更简单）
+db.url=jdbc:sqlite:gameengine.db
+db.username=
+db.password=
+db.driver=org.sqlite.JDBC
+```
+
+**步骤3：添加JDBC驱动**
+
+下载对应数据库的JDBC驱动并放到项目根目录或添加到classpath。
+
+详细配置说明请查看：[sql/README.md](sql/README.md)
+
+**默认测试账号：**
+- 用户名: `test` / 密码: `test`
+- 用户名: `admin` / 密码: `admin123`
 
 ### 编译和运行
 
