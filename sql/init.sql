@@ -1,9 +1,18 @@
+-- ========================================
 -- Text Adventure Game Database Initialization Script
--- This script creates the database schema for user management
+-- MySQL Version
+-- ========================================
+-- This script will:
+--   1. Create 'gameengine' database
+--   2. Create 'users' table
+--   3. Insert sample test users
+-- ========================================
 
--- Create database (for MySQL)
--- CREATE DATABASE IF NOT EXISTS gameengine DEFAULT CHARACTER SET utf8mb4;
--- USE gameengine;
+-- Create database
+CREATE DATABASE IF NOT EXISTS gameengine DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Use the database
+USE gameengine;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

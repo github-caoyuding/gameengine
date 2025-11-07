@@ -56,58 +56,95 @@ gameengine/
 ### 前置要求
 
 - Java JDK 8 或更高版本
-- (可选) 数据库服务器：MySQL 5.7+ / PostgreSQL 9.6+ / SQLite 3+
-- (可选) 相应的 JDBC 驱动包
+- **(推荐) MySQL 5.7+ 数据库服务器**
+- **(推荐) MySQL Connector/J 8.0+ JDBC驱动**
 
-### 数据库配置（可选）
+### 数据库配置
 
-游戏支持三种运行模式：
+游戏支持两种运行模式：
 
-**1. 游客模式（无需数据库）**
-- 直接运行游戏，选择"Guest Mode"即可游玩
-- 不需要任何数据库配置
+#### 模式1：数据库模式（推荐 - 完整功能）
 
-**2. 数据库模式（推荐）**
+使用 MySQL 数据库，支持用户注册、登录、数据持久化。
 
-如果要使用登录注册功能，需要配置数据库：
+**步骤1：安装 MySQL**
 
-**步骤1：初始化数据库**
+确保已安装 MySQL 5.7 或更高版本。
 
 ```bash
-# MySQL
-mysql -u root -p < sql/init.sql
-
-# SQLite (最简单)
-sqlite3 gameengine.db < sql/init_sqlite.sql
+# 检查 MySQL 是否已安装
+mysql --version
 ```
 
-**步骤2：配置数据库连接**
+**步骤2：创建数据库并初始化**
 
-编辑 `resources/db.properties` 文件：
+```bash
+# 登录 MySQL
+mysql -u root -p
+
+# 执行初始化脚本（自动创建数据库和表）
+source sql/init.sql;
+
+# 或者在命令行直接执行
+mysql -u root -p < sql/init.sql
+```
+
+**步骤3：配置数据库连接**
+
+编辑 `resources/db.properties` 文件，设置你的 MySQL 密码：
 
 ```properties
-# MySQL 示例
-db.url=jdbc:mysql://localhost:3306/gameengine
+db.url=jdbc:mysql://localhost:3306/gameengine?useSSL=false&serverTimezone=UTC
 db.username=root
-db.password=your_password
+db.password=你的MySQL密码    # ← 修改这里！
 db.driver=com.mysql.cj.jdbc.Driver
-
-# 或 SQLite 示例（更简单）
-db.url=jdbc:sqlite:gameengine.db
-db.username=
-db.password=
-db.driver=org.sqlite.JDBC
 ```
 
-**步骤3：添加JDBC驱动**
+**步骤4：下载 MySQL JDBC 驱动**
 
-下载对应数据库的JDBC驱动并放到项目根目录或添加到classpath。
+下载地址：https://dev.mysql.com/downloads/connector/j/
 
-详细配置说明请查看：[sql/README.md](sql/README.md)
+或者使用 Maven：
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+```
+
+将下载的 `mysql-connector-java-8.0.xx.jar` 放到项目根目录。
+
+**步骤5：运行游戏（带 JDBC 驱动）**
+
+```bash
+# Linux/Mac
+java -cp "bin:mysql-connector-java-8.0.xx.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
+
+# Windows
+java -cp "bin;mysql-connector-java-8.0.xx.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
+```
 
 **默认测试账号：**
 - 用户名: `test` / 密码: `test`
 - 用户名: `admin` / 密码: `admin123`
+- 用户名: `player1` / 密码: `pass123`
+
+#### 模式2：游客模式（快速体验）
+
+无需数据库，直接运行游戏：
+
+```bash
+./run.sh
+# 选择 "3. Guest Mode (Skip Login)"
+```
+
+**注意：** 游客模式下无法保存游戏进度和用户数据。
+
+---
+
+**其他数据库支持：**
+如需使用 PostgreSQL 或 SQLite，请查看：[sql/README.md](sql/README.md)
 
 ### 编译和运行
 
