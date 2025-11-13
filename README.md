@@ -146,7 +146,41 @@ java -cp "bin;mysql-connector-java-8.0.xx.jar" -Dfile.encoding=UTF-8 com.textadv
 **其他数据库支持：**
 如需使用 PostgreSQL 或 SQLite，请查看：[sql/README.md](sql/README.md)
 
-### 编译和运行
+---
+
+### 一键运行（推荐 ⭐）
+
+**最简单的方式！** 自动处理编译、JDBC驱动检测和运行。
+
+**Linux/Mac:**
+
+```bash
+# 赋予执行权限（首次运行）
+chmod +x run_game.sh
+
+# 一键运行
+./run_game.sh
+```
+
+**Windows:**
+
+```cmd
+# 双击运行或命令行执行
+run_game.bat
+```
+
+**脚本功能：**
+- ✅ 自动检测 MySQL JDBC 驱动
+- ✅ 如果没有驱动，提示下载（可自动下载）
+- ✅ 自动编译项目
+- ✅ 使用正确的 classpath 运行游戏
+- ✅ 彩色输出和友好提示
+
+---
+
+### 手动编译和运行
+
+如果你想手动控制编译和运行过程：
 
 **Linux/Mac:**
 
@@ -157,8 +191,11 @@ chmod +x compile.sh run.sh
 # 编译项目
 ./compile.sh
 
-# 运行游戏
+# 运行游戏（无数据库）
 ./run.sh
+
+# 运行游戏（带 MySQL）
+java -cp "bin:mysql-connector-java-8.0.33.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
 ```
 
 **Windows:**
@@ -167,11 +204,14 @@ chmod +x compile.sh run.sh
 # 编译项目
 compile.bat
 
-# 运行游戏
+# 运行游戏（无数据库）
 run.bat
+
+# 运行游戏（带 MySQL）
+java -cp "bin;mysql-connector-java-8.0.33.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
 ```
 
-**手动编译和运行:**
+**完整编译命令:**
 
 ```bash
 # 编译
