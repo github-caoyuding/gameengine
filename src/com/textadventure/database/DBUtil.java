@@ -105,6 +105,30 @@ public class DBUtil {
     }
 
     /**
+     * 获取数据库URL配置
+     * @return 数据库URL
+     */
+    public static String getUrl() {
+        return url;
+    }
+
+    /**
+     * 获取数据库用户名配置
+     * @return 数据库用户名
+     */
+    public static String getUsername() {
+        return username;
+    }
+
+    /**
+     * 获取数据库密码配置
+     * @return 数据库密码
+     */
+    public static String getPassword() {
+        return password;
+    }
+
+    /**
      * 关闭数据库资源
      * @param conn 数据库连接
      * @param stmt PreparedStatement对象

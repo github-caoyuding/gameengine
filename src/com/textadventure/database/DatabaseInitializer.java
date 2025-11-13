@@ -174,14 +174,17 @@ public class DatabaseInitializer {
 
         try {
             // Extract base URL (remove database name)
-            String configUrl = getConfigUrl();
+            String configUrl = DBUtil.getUrl();
             String baseUrl = null;
 
-            if (configUrl != null) {
+            if (configUrl != null && !configUrl.isEmpty()) {
+                System.out.println("  Parsing URL: " + configUrl);
+
                 // Remove database name from URL
                 // Example: jdbc:mysql://localhost:3306/gameengine?... -> jdbc:mysql://localhost:3306?...
                 if (configUrl.contains("/gameengine")) {
                     baseUrl = configUrl.replace("/gameengine", "");
+                    System.out.println("  Base URL: " + baseUrl);
                 } else {
                     // Try to remove the last path component
                     int lastSlash = configUrl.lastIndexOf('/');
@@ -194,19 +197,21 @@ public class DatabaseInitializer {
                             // No parameters: jdbc:mysql://localhost:3306/gameengine
                             baseUrl = configUrl.substring(0, lastSlash);
                         }
+                        System.out.println("  Base URL: " + baseUrl);
                     }
                 }
             }
 
-            if (baseUrl == null) {
+            if (baseUrl == null || baseUrl.isEmpty()) {
                 System.err.println("Cannot determine MySQL server URL from configuration.");
+                System.err.println("Current URL: " + configUrl);
                 System.err.println("Please create the database manually:");
-                System.err.println("  mysql -u root -p -e \"CREATE DATABASE gameengine;\"");
+                System.err.println("  mysql -h your_host -u root -p -e \"CREATE DATABASE gameengine;\"");
                 return false;
             }
 
             // Connect to MySQL server without specifying database
-            conn = java.sql.DriverManager.getConnection(baseUrl, getConfigUsername(), getConfigPassword());
+            conn = java.sql.DriverManager.getConnection(baseUrl, DBUtil.getUsername(), DBUtil.getPassword());
             stmt = conn.createStatement();
 
             // Create database
@@ -230,57 +235,4 @@ public class DatabaseInitializer {
         }
     }
 
-    /**
-     * Get database URL from configuration (helper method)
-     */
-    private static String getConfigUrl() {
-        try {
-            java.io.InputStream input = DBUtil.class.getClassLoader().getResourceAsStream("db.properties");
-            if (input != null) {
-                java.util.Properties props = new java.util.Properties();
-                props.load(input);
-                input.close();
-                return props.getProperty("db.url");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        return null;
-    }
-
-    /**
-     * Get database username from configuration
-     */
-    private static String getConfigUsername() {
-        try {
-            java.io.InputStream input = DBUtil.class.getClassLoader().getResourceAsStream("db.properties");
-            if (input != null) {
-                java.util.Properties props = new java.util.Properties();
-                props.load(input);
-                input.close();
-                return props.getProperty("db.username");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        return "root";
-    }
-
-    /**
-     * Get database password from configuration
-     */
-    private static String getConfigPassword() {
-        try {
-            java.io.InputStream input = DBUtil.class.getClassLoader().getResourceAsStream("db.properties");
-            if (input != null) {
-                java.util.Properties props = new java.util.Properties();
-                props.load(input);
-                input.close();
-                return props.getProperty("db.password");
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-        return "";
-    }
 }
