@@ -24,9 +24,20 @@ public class DatabaseInitializer {
             conn = DBUtil.getConnection();
 
             if (conn == null) {
-                System.err.println("Cannot connect to database. Please check your database configuration.");
-                System.err.println("Make sure MySQL is running and credentials in db.properties are correct.");
-                return false;
+                // Connection failed - check if it's because database doesn't exist
+                SQLException error = DBUtil.getLastError();
+                if (error != null && (error.getMessage().contains("Unknown database") ||
+                                      error.getMessage().contains("不存在"))) {
+                    System.out.println("Database 'gameengine' doesn't exist. Attempting to create...");
+                    return createDatabaseAndRetry();
+                } else {
+                    System.err.println("Cannot connect to database. Please check your database configuration.");
+                    System.err.println("Make sure MySQL is running and credentials in db.properties are correct.");
+                    if (error != null) {
+                        System.err.println("Error: " + error.getMessage());
+                    }
+                    return false;
+                }
             }
 
             stmt = conn.createStatement();

@@ -19,6 +19,7 @@ public class DBUtil {
     private static String username;
     private static String password;
     private static String driver;
+    private static SQLException lastError = null;
 
     // 静态代码块，加载配置文件
     static {
@@ -88,9 +89,19 @@ public class DBUtil {
         try {
             return DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
+            // Store the error message for DatabaseInitializer to check
+            lastError = e;
             System.err.println("Failed to connect to database: " + e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * 获取最后的连接错误
+     * @return 最后的 SQLException，如果没有错误返回 null
+     */
+    public static SQLException getLastError() {
+        return lastError;
     }
 
     /**
