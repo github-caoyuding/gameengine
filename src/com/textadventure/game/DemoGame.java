@@ -1,6 +1,7 @@
 package com.textadventure.game;
 
 import com.textadventure.core.*;
+import com.textadventure.database.DatabaseInitializer;
 import com.textadventure.engine.GameEngine;
 import com.textadventure.engine.LoginService;
 import com.textadventure.engine.WinCondition;
@@ -11,6 +12,11 @@ import com.textadventure.engine.WinCondition;
 public class DemoGame {
 
     public static void main(String[] args) {
+        // 自动初始化数据库（创建表和插入测试数据）
+        DatabaseInitializer.initialize();
+
+        System.out.println();
+
         // 用户登录
         LoginService loginService = new LoginService();
         User user = loginService.showLoginMenu();
