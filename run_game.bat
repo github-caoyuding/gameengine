@@ -28,52 +28,58 @@ for %%f in (mysql-connector-java-*.jar) do (
 :found
 
 if "%JDBC_JAR%"=="" (
-    echo MySQL JDBC Driver not found!
-    echo.
-    echo You have 3 options:
-    echo.
-    echo   1. Download manually:
-    echo      https://dev.mysql.com/downloads/connector/j/
-    echo.
-    echo   2. Use PowerShell to download:
-    echo      powershell -Command "Invoke-WebRequest -Uri 'https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.2.0.zip' -OutFile 'mysql-connector-j-8.2.0.zip'"
-    echo      powershell -Command "Expand-Archive -Path mysql-connector-j-8.2.0.zip -DestinationPath ."
-    echo      copy mysql-connector-j-8.2.0\mysql-connector-j-8.2.0.jar .
-    echo.
-    echo   3. Run in Guest Mode ^(no database required^):
-    echo      run.bat
+    echo MySQL JDBC Driver not found. Auto-downloading...
     echo.
 
-    set /p DOWNLOAD="Download now using PowerShell? (y/n): "
+    set VERSION=8.2.0
+    set FILENAME=mysql-connector-j-%VERSION%
+    set MAVEN_URL=https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/%VERSION%/%FILENAME%.jar
 
-    if /i "%DOWNLOAD%"=="y" (
-        echo.
-        echo Downloading MySQL Connector/J...
+    echo Downloading MySQL JDBC Driver ^(%VERSION%^)...
+    echo Source: Maven Central Repository
+    echo.
 
-        powershell -Command "try { Invoke-WebRequest -Uri 'https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.2.0.zip' -OutFile 'mysql-connector-j-8.2.0.zip'; exit 0 } catch { exit 1 }"
+    REM Try downloading JAR directly from Maven Central
+    powershell -Command "try { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri '%MAVEN_URL%' -OutFile '%FILENAME%.jar' -ErrorAction Stop; Write-Host 'Download complete!' -ForegroundColor Green; exit 0 } catch { exit 1 }"
 
-        if errorlevel 1 (
-            echo Download failed! Please download manually.
-            pause
-            exit /b 1
-        )
-
-        echo Extracting...
-        powershell -Command "Expand-Archive -Path mysql-connector-j-8.2.0.zip -DestinationPath . -Force"
-        copy mysql-connector-j-8.2.0\mysql-connector-j-8.2.0.jar . >nul
-
-        REM Cleanup
-        del mysql-connector-j-8.2.0.zip >nul 2>&1
-        rmdir /s /q mysql-connector-j-8.2.0 >nul 2>&1
-
-        set JDBC_JAR=mysql-connector-j-8.2.0.jar
-        echo Download complete!
+    if not errorlevel 1 (
+        set JDBC_JAR=%FILENAME%.jar
         echo.
     ) else (
         echo.
-        echo Exiting. Please download the JDBC driver and run again.
-        pause
-        exit /b 0
+        echo Maven Central download failed. Trying alternative source...
+        echo.
+
+        REM Fallback: Try MySQL official site
+        set ZIP_URL=https://dev.mysql.com/get/Downloads/Connector-J/%FILENAME%.zip
+
+        powershell -Command "try { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri '%ZIP_URL%' -OutFile '%FILENAME%.zip' -ErrorAction Stop; exit 0 } catch { exit 1 }"
+
+        if not errorlevel 1 (
+            echo Extracting...
+            powershell -Command "Expand-Archive -Path %FILENAME%.zip -DestinationPath . -Force"
+            copy %FILENAME%\%FILENAME%.jar . >nul
+
+            REM Cleanup
+            del %FILENAME%.zip >nul 2>&1
+            rmdir /s /q %FILENAME% >nul 2>&1
+
+            set JDBC_JAR=%FILENAME%.jar
+            echo Download complete!
+            echo.
+        ) else (
+            echo.
+            echo Auto-download failed!
+            echo.
+            echo Please download manually from:
+            echo   https://dev.mysql.com/downloads/connector/j/
+            echo.
+            echo Or run in Guest Mode ^(no database^):
+            echo   run.bat
+            echo.
+            pause
+            exit /b 1
+        )
     )
 )
 
