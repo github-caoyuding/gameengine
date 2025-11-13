@@ -126,9 +126,48 @@ public class DBUtil {
     }
 
     /**
+     * 关闭数据库资源 (Statement版本)
+     * @param conn 数据库连接
+     * @param stmt Statement对象
+     * @param rs ResultSet对象
+     */
+    public static void close(Connection conn, java.sql.Statement stmt, ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * 关闭连接和PreparedStatement
      */
     public static void close(Connection conn, PreparedStatement stmt) {
+        close(conn, stmt, null);
+    }
+
+    /**
+     * 关闭连接和Statement
+     */
+    public static void close(Connection conn, java.sql.Statement stmt) {
         close(conn, stmt, null);
     }
 
