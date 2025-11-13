@@ -28,7 +28,7 @@ for %%f in (mysql-connector-java-*.jar) do (
 )
 :found
 
-if "%JDBC_JAR%"=="" (
+if "!JDBC_JAR!"=="" (
     echo MySQL JDBC Driver not found. Auto-downloading...
     echo.
 
@@ -84,7 +84,7 @@ if "%JDBC_JAR%"=="" (
     )
 )
 
-echo Found JDBC driver: %JDBC_JAR%
+echo Found JDBC driver: !JDBC_JAR!
 echo.
 
 REM Create bin directory if not exists
@@ -108,7 +108,7 @@ echo Starting game...
 echo ========================================
 echo.
 
-java -cp "bin;%JDBC_JAR%" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
+java -cp "bin;!JDBC_JAR!" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
 
 echo.
 echo ========================================
