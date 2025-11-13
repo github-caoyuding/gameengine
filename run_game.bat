@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 REM ========================================
 REM Text Adventure Game - Auto Run Script
 REM ========================================
@@ -32,18 +33,18 @@ if "%JDBC_JAR%"=="" (
     echo.
 
     set VERSION=8.2.0
-    set FILENAME=mysql-connector-j-%VERSION%
-    set MAVEN_URL=https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/%VERSION%/%FILENAME%.jar
+    set FILENAME=mysql-connector-j-!VERSION!
+    set MAVEN_URL=https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/!VERSION!/!FILENAME!.jar
 
-    echo Downloading MySQL JDBC Driver ^(%VERSION%^)...
+    echo Downloading MySQL JDBC Driver ^(!VERSION!^)...
     echo Source: Maven Central Repository
     echo.
 
     REM Try downloading JAR directly from Maven Central
-    powershell -Command "try { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri '%MAVEN_URL%' -OutFile '%FILENAME%.jar' -ErrorAction Stop; Write-Host 'Download complete!' -ForegroundColor Green; exit 0 } catch { exit 1 }"
+    powershell -Command "try { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri '!MAVEN_URL!' -OutFile '!FILENAME!.jar' -ErrorAction Stop; Write-Host 'Download complete!' -ForegroundColor Green; exit 0 } catch { exit 1 }"
 
     if not errorlevel 1 (
-        set JDBC_JAR=%FILENAME%.jar
+        set JDBC_JAR=!FILENAME!.jar
         echo.
     ) else (
         echo.
@@ -51,20 +52,20 @@ if "%JDBC_JAR%"=="" (
         echo.
 
         REM Fallback: Try MySQL official site
-        set ZIP_URL=https://dev.mysql.com/get/Downloads/Connector-J/%FILENAME%.zip
+        set ZIP_URL=https://dev.mysql.com/get/Downloads/Connector-J/!FILENAME!.zip
 
-        powershell -Command "try { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri '%ZIP_URL%' -OutFile '%FILENAME%.zip' -ErrorAction Stop; exit 0 } catch { exit 1 }"
+        powershell -Command "try { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri '!ZIP_URL!' -OutFile '!FILENAME!.zip' -ErrorAction Stop; exit 0 } catch { exit 1 }"
 
         if not errorlevel 1 (
             echo Extracting...
-            powershell -Command "Expand-Archive -Path %FILENAME%.zip -DestinationPath . -Force"
-            copy %FILENAME%\%FILENAME%.jar . >nul
+            powershell -Command "Expand-Archive -Path !FILENAME!.zip -DestinationPath . -Force"
+            copy !FILENAME!\!FILENAME!.jar . >nul
 
             REM Cleanup
-            del %FILENAME%.zip >nul 2>&1
-            rmdir /s /q %FILENAME% >nul 2>&1
+            del !FILENAME!.zip >nul 2>&1
+            rmdir /s /q !FILENAME! >nul 2>&1
 
-            set JDBC_JAR=%FILENAME%.jar
+            set JDBC_JAR=!FILENAME!.jar
             echo Download complete!
             echo.
         ) else (
