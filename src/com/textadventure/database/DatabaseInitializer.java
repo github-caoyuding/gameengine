@@ -25,6 +25,7 @@ public class DatabaseInitializer {
 
             if (conn == null) {
                 System.err.println("Cannot connect to database. Please check your database configuration.");
+                System.err.println("Make sure MySQL is running and credentials in db.properties are correct.");
                 return false;
             }
 
@@ -32,10 +33,14 @@ public class DatabaseInitializer {
 
             // Check if users table exists
             if (!tableExists(conn, "users")) {
+                System.out.println("========================================");
                 System.out.println("Initializing database...");
+                System.out.println("========================================");
                 createTables(stmt);
                 insertDefaultData(stmt);
+                System.out.println("========================================");
                 System.out.println("Database initialization complete!");
+                System.out.println("========================================");
                 return true;
             } else {
                 // Table exists, check if it has data
@@ -48,13 +53,26 @@ public class DatabaseInitializer {
             }
 
         } catch (SQLException e) {
-            System.err.println("Database initialization error: " + e.getMessage());
+            System.err.println("========================================");
+            System.err.println("Database initialization error!");
+            System.err.println("========================================");
+            System.err.println("Error message: " + e.getMessage());
+            System.err.println("Error code: " + e.getErrorCode());
+            System.err.println("SQL state: " + e.getSQLState());
 
             // If database doesn't exist, try to create it
-            if (e.getMessage().contains("Unknown database")) {
+            if (e.getMessage().contains("Unknown database") || e.getMessage().contains("不存在")) {
+                System.out.println("");
                 return createDatabaseAndRetry();
             }
 
+            System.err.println("");
+            System.err.println("Please check:");
+            System.err.println("  1. MySQL server is running");
+            System.err.println("  2. Database 'gameengine' exists");
+            System.err.println("  3. User has CREATE/INSERT permissions");
+            System.err.println("========================================");
+            e.printStackTrace();
             return false;
         } finally {
             DBUtil.close(conn, stmt);
