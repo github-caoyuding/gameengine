@@ -6,13 +6,13 @@
 
 - 🎮 完整的游戏引擎系统
 - 🔐 用户登录系统，支持注册、登录、游客模式
-- 💾 JDBC数据库集成，支持MySQL/PostgreSQL/SQLite
+- 💾 MySQL数据库集成，自动初始化
 - 🗺️ 房间系统，支持多方向连接
 - 🎒 物品系统，可拾取和丢弃物品
 - 💬 命令解析器，支持中英文命令
 - 🏆 胜利条件系统，任务进度追踪
 - 🎯 面向对象设计，易于扩展
-- 📦 基于 Java SE + JDBC
+- ⚡ 一键运行，自动下载JDBC驱动
 
 ## 项目结构
 
@@ -21,205 +21,117 @@ gameengine/
 ├── src/
 │   └── com/
 │       └── textadventure/
-│           ├── core/           # 核心游戏类
-│           │   ├── Direction.java    # 方向枚举
-│           │   ├── Item.java         # 物品类
-│           │   ├── Player.java       # 玩家类
-│           │   ├── Room.java         # 房间类
-│           │   └── User.java         # 用户实体类
-│           ├── database/       # 数据库层
-│           │   ├── DBUtil.java       # JDBC工具类
-│           │   └── UserDAO.java      # 用户数据访问对象
-│           ├── engine/         # 游戏引擎
-│           │   ├── Command.java      # 命令类
-│           │   ├── GameEngine.java   # 游戏引擎
-│           │   ├── LoginService.java # 登录服务
-│           │   └── WinCondition.java # 胜利条件
-│           └── game/           # 游戏实现
-│               └── DemoGame.java     # 示例游戏
-├── resources/                  # 资源文件
-│   └── db.properties           # 数据库配置
-├── sql/                        # SQL脚本
-│   ├── init.sql                # MySQL初始化脚本
-│   ├── init_sqlite.sql         # SQLite初始化脚本
-│   └── README.md               # 数据库设置说明
-├── bin/                        # 编译输出目录
-├── compile.sh                  # Linux/Mac 编译脚本
-├── run.sh                      # Linux/Mac 运行脚本
-├── compile.bat                 # Windows 编译脚本
-├── run.bat                     # Windows 运行脚本
-└── README.md                   # 本文件
+│           ├── core/                    # 核心游戏类
+│           │   ├── Direction.java       # 方向枚举
+│           │   ├── Item.java            # 物品类
+│           │   ├── Player.java          # 玩家类
+│           │   ├── Room.java            # 房间类
+│           │   └── User.java            # 用户实体类
+│           ├── database/                # 数据库层
+│           │   ├── DBUtil.java          # JDBC工具类
+│           │   ├── UserDAO.java         # 用户数据访问对象
+│           │   └── DatabaseInitializer.java # 数据库自动初始化
+│           ├── engine/                  # 游戏引擎
+│           │   ├── Command.java         # 命令类
+│           │   ├── GameEngine.java      # 游戏引擎
+│           │   ├── LoginService.java    # 登录服务
+│           │   └── WinCondition.java    # 胜利条件
+│           └── game/                    # 游戏实现
+│               └── DemoGame.java        # 示例游戏
+├── resources/                           # 资源文件
+│   └── db.properties                    # 数据库配置
+├── sql/                                 # SQL脚本
+│   └── init.sql                         # MySQL初始化脚本（供参考）
+├── bin/                                 # 编译输出目录
+├── compile.bat                          # 编译脚本
+├── run.bat                              # 运行脚本（游客模式）
+├── run_game.bat                         # 一键运行脚本（推荐）⭐
+└── README.md                            # 本文件
 ```
 
 ## 快速开始
 
 ### 前置要求
 
-- Java JDK 8 或更高版本
-- **(推荐) MySQL 5.7+ 数据库服务器**
-- **(推荐) MySQL Connector/J 8.0+ JDBC驱动**
+- **Java JDK 8 或更高版本**
+- **MySQL 5.7+ 数据库服务器**
 
-### 数据库配置
-
-游戏支持两种运行模式：
-
-#### 模式1：数据库模式（推荐 - 完整功能）
-
-使用 MySQL 数据库，支持用户注册、登录、数据持久化。
-
-**步骤1：安装 MySQL**
+### 第一步：安装 MySQL
 
 确保已安装 MySQL 5.7 或更高版本。
 
-```bash
-# 检查 MySQL 是否已安装
+检查是否已安装：
+```cmd
 mysql --version
 ```
 
-**步骤2：创建数据库并初始化**
+如果未安装，请从官网下载：https://dev.mysql.com/downloads/mysql/
 
-```bash
-# 登录 MySQL
-mysql -u root -p
+### 第二步：配置数据库连接
 
-# 执行初始化脚本（自动创建数据库和表）
-source sql/init.sql;
-
-# 或者在命令行直接执行
-mysql -u root -p < sql/init.sql
-```
-
-**步骤3：配置数据库连接**
-
-编辑 `resources/db.properties` 文件，设置你的 MySQL 密码：
+编辑 `resources/db.properties` 文件，设置你的 MySQL 连接信息：
 
 ```properties
-db.url=jdbc:mysql://localhost:3306/gameengine?useSSL=false&serverTimezone=UTC
+# MySQL 服务器地址和端口
+db.url=jdbc:mysql://localhost:3306/gameengine?useSSL=false&serverTimezone=UTC&characterEncoding=utf8&allowPublicKeyRetrieval=true
+
+# MySQL 用户名
 db.username=root
+
+# MySQL 密码（必须设置！）
 db.password=你的MySQL密码    # ← 修改这里！
+
+# JDBC 驱动类名
 db.driver=com.mysql.cj.jdbc.Driver
 ```
 
-**步骤4：下载 MySQL JDBC 驱动**
+**重要提示：**
+- 如果 MySQL 在其他服务器上，请修改 `localhost` 为服务器 IP 地址
+- 如果端口不是 3306，请修改端口号
+- **必须设置正确的密码！**
 
-下载地址：https://dev.mysql.com/downloads/connector/j/
+### 第三步：一键运行（推荐 ⭐）
 
-或者使用 Maven：
-```xml
-<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.33</version>
-</dependency>
-```
-
-将下载的 `mysql-connector-java-8.0.xx.jar` 放到项目根目录。
-
-**步骤5：运行游戏（带 JDBC 驱动）**
-
-```bash
-# Linux/Mac
-java -cp "bin:mysql-connector-java-8.0.xx.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
-
-# Windows
-java -cp "bin;mysql-connector-java-8.0.xx.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
-```
-
-**默认测试账号：**
-- 用户名: `test` / 密码: `test`
-- 用户名: `admin` / 密码: `admin123`
-- 用户名: `player1` / 密码: `pass123`
-
-#### 模式2：游客模式（快速体验）
-
-无需数据库，直接运行游戏：
-
-```bash
-./run.sh
-# 选择 "3. Guest Mode (Skip Login)"
-```
-
-**注意：** 游客模式下无法保存游戏进度和用户数据。
-
----
-
-**其他数据库支持：**
-如需使用 PostgreSQL 或 SQLite，请查看：[sql/README.md](sql/README.md)
-
----
-
-### 一键运行（推荐 ⭐）
-
-**最简单的方式！** 自动处理编译、JDBC驱动检测和运行。
-
-**Linux/Mac:**
-
-```bash
-# 赋予执行权限（首次运行）
-chmod +x run_game.sh
-
-# 一键运行
-./run_game.sh
-```
-
-**Windows:**
+**最简单的方式！** 双击或在命令行运行：
 
 ```cmd
-# 双击运行或命令行执行
 run_game.bat
 ```
 
-**脚本功能：**
-- ✅ 自动检测 MySQL JDBC 驱动
-- ✅ 如果没有驱动，提示下载（可自动下载）
+**脚本会自动完成：**
+- ✅ 检测 MySQL JDBC 驱动
+- ✅ 自动下载驱动（如果不存在）
 - ✅ 自动编译项目
-- ✅ 使用正确的 classpath 运行游戏
-- ✅ 彩色输出和友好提示
+- ✅ 自动创建数据库 `gameengine`（如果不存在）
+- ✅ 自动创建 `users` 表
+- ✅ 自动插入 4 个测试用户
+- ✅ 启动游戏
 
----
+**默认测试账号：**
+- 用户名: `admin` / 密码: `admin123`
+- 用户名: `player1` / 密码: `pass123`
+- 用户名: `player2` / 密码: `pass123`
+- 用户名: `test` / 密码: `test`
 
-### 手动编译和运行
+## 游戏模式
 
-如果你想手动控制编译和运行过程：
+### 1. 登录模式（数据库）
 
-**Linux/Mac:**
+使用已注册的账号登录，可以保存游戏进度。
 
-```bash
-# 赋予脚本执行权限
-chmod +x compile.sh run.sh
+### 2. 注册模式
 
-# 编译项目
-./compile.sh
+创建新账号，数据保存在 MySQL 数据库中。
 
-# 运行游戏（无数据库）
-./run.sh
+### 3. 游客模式
 
-# 运行游戏（带 MySQL）
-java -cp "bin:mysql-connector-java-8.0.33.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
-```
-
-**Windows:**
+无需登录，直接游玩。可以使用 `run.bat` 快速进入游客模式。
 
 ```cmd
-# 编译项目
-compile.bat
-
-# 运行游戏（无数据库）
 run.bat
-
-# 运行游戏（带 MySQL）
-java -cp "bin;mysql-connector-java-8.0.33.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
 ```
 
-**完整编译命令:**
-
-```bash
-# 编译
-javac -d bin -sourcepath src src/com/textadventure/game/DemoGame.java
-
-# 运行
-java -cp bin com.textadventure.game.DemoGame
-```
+**注意：** 游客模式下无法保存游戏进度。
 
 ## 游戏命令
 
@@ -228,6 +140,7 @@ java -cp bin com.textadventure.game.DemoGame
 - `look` / `观察` / `l` - 查看当前房间
 - `help` / `帮助` - 显示帮助信息
 - `quit` / `退出` - 退出游戏
+- `progress` / `进度` / `任务` - 查看任务进度
 
 ### 移动命令
 
@@ -244,19 +157,24 @@ java -cp bin com.textadventure.game.DemoGame
 - `take <物品>` / `拿取 <物品>` - 拾取物品
 - `drop <物品>` / `丢弃 <物品>` - 丢弃物品
 - `inventory` / `背包` / `i` - 查看背包
-- `examine <物品>` / `检查 <物品>` / `x <物品>` - 检查物品
+- `examine <物品>` / `检查 <物品>` / `x <物品>` - 检查物品详情
 
-### 任务命令
+## 示例游戏：神秘洞穴探险
 
-- `progress` / `进度` / `任务` - 查看任务进度和完成情况
+项目包含一个完整的示例游戏，包含：
 
-## 示例游戏
+- **5 个不同的房间**
+  - 洞穴入口
+  - 阴暗走廊
+  - 宝藏室
+  - 黑暗密室
+  - 地下花园
 
-项目包含一个示例游戏 "神秘洞穴探险"，包含：
+- **10+ 种可收集的物品**
+  - 火把、绳索、金币、宝石等
 
-- 5 个不同的房间（洞穴入口、阴暗走廊、宝藏室、黑暗密室、地下花园）
-- 10+ 种可收集的物品
-- 多方向的探索路径
+- **多方向的探索路径**
+  - 支持北、南、东、西、上、下六个方向
 
 ### 胜利条件
 
@@ -264,31 +182,59 @@ java -cp bin com.textadventure.game.DemoGame
 
 1. **探索所有房间** - 访问全部 5 个房间
 2. **收集关键物品** - 拿到以下 3 个关键物品：
-   - 王冠（在宝藏室）
-   - 水晶（在地下花园）
-   - 钥匙（在黑暗密室）
+   - 👑 王冠（在宝藏室）
+   - 💎 水晶（在地下花园）
+   - 🔑 钥匙（在黑暗密室）
 
-**提示**：
+**游戏提示：**
 - 使用 `progress` 命令随时查看任务进度
-- 探索所有方向（北、南、东、西、上、下）找到所有房间
+- 探索所有方向找到隐藏的房间
 - 不是所有物品都是必需的，只需要收集关键物品
 - 完成所有任务后会自动显示胜利画面
 
+## 手动编译和运行
+
+如果你想手动控制编译和运行过程：
+
+### 编译项目
+
+```cmd
+compile.bat
+```
+
+或手动编译：
+```cmd
+javac -encoding UTF-8 -d bin -sourcepath src src\com\textadventure\game\DemoGame.java
+```
+
+### 运行游戏
+
+**游客模式（无数据库）：**
+```cmd
+run.bat
+```
+
+**完整模式（带数据库）：**
+```cmd
+java -cp "bin;mysql-connector-j-8.2.0.jar" -Dfile.encoding=UTF-8 com.textadventure.game.DemoGame
+```
+
 ## 如何创建自己的游戏
 
-1. 创建一个新的类（例如 `MyGame.java`）在 `com.textadventure.game` 包中
+1. 在 `src/com/textadventure/game` 包中创建新类（例如 `MyGame.java`）
 2. 创建房间和物品
 3. 设置房间之间的连接
 4. 创建玩家并设置初始房间
 5. 启动游戏引擎
 
-示例代码：
+**示例代码：**
 
 ```java
 package com.textadventure.game;
 
 import com.textadventure.core.*;
 import com.textadventure.engine.GameEngine;
+import com.textadventure.engine.WinCondition;
 
 public class MyGame {
     public static void main(String[] args) {
@@ -307,8 +253,14 @@ public class MyGame {
         Player player = new Player("勇者");
         player.setCurrentRoom(startRoom);
 
+        // 创建胜利条件
+        WinCondition winCondition = new WinCondition();
+        winCondition.setRequiredRoomCount(2);
+        winCondition.addRequiredItem("钥匙");
+
         // 启动游戏
         GameEngine engine = new GameEngine(player);
+        engine.setWinCondition(winCondition);
         engine.start();
     }
 }
@@ -317,36 +269,63 @@ public class MyGame {
 ## 核心类说明
 
 ### Direction (方向枚举)
-
-定义游戏中的六个方向：北、南、东、西、上、下。
+定义游戏中的六个方向：北、南、东、西、上、下。支持中英文解析。
 
 ### Room (房间类)
-
 - 房间名称和描述
-- 连接到其他房间的出口
-- 房间中的物品列表
+- 连接到其他房间的出口 (Map<Direction, Room>)
+- 房间中的物品列表 (List<Item>)
 
 ### Item (物品类)
-
 - 物品名称和描述
 - 是否可以被拾取的标志
 
 ### Player (玩家类)
-
 - 玩家名称
 - 当前所在房间
 - 背包（物品列表）
 - 背包容量限制
+- 已访问房间追踪
 
 ### Command (命令类)
-
-解析玩家输入的文本命令，将其分解为动词和对象。
+解析玩家输入的文本命令，将其分解为动词和对象。支持中英文命令。
 
 ### GameEngine (游戏引擎)
-
-- 处理游戏循环
+- 处理游戏主循环
 - 解析和执行命令
 - 管理游戏状态
+- 检查胜利条件
+
+### WinCondition (胜利条件)
+- 设置需要访问的房间数量
+- 设置需要收集的关键物品
+- 实时追踪任务进度
+- 提供进度查询功能
+
+### LoginService (登录服务)
+- 用户登录验证
+- 新用户注册
+- 游客模式支持
+
+### DatabaseInitializer (数据库初始化器)
+- 自动创建数据库
+- 自动创建表结构
+- 自动插入测试数据
+
+## 技术要点
+
+本项目使用的 Java SE 知识点：
+
+- **面向对象编程（OOP）**
+- **类和对象**
+- **枚举类型** (Direction)
+- **集合框架** (List, Map, Set)
+- **异常处理** (try-catch-finally)
+- **输入/输出** (Scanner)
+- **字符串处理**
+- **JDBC 数据库连接**
+- **PreparedStatement 防SQL注入**
+- **包管理和模块化设计**
 
 ## 扩展建议
 
@@ -355,74 +334,43 @@ public class MyGame {
 1. **添加 NPC 系统** - 创建可以对话的非玩家角色
 2. **添加战斗系统** - 实现敌人和战斗机制
 3. **添加谜题系统** - 创建需要特定物品或条件才能解决的谜题
-4. **添加保存/加载功能** - 实现游戏进度的保存和加载
-5. **添加任务系统** - 创建任务追踪和完成机制
-6. **添加物品组合** - 允许物品之间的组合和使用
-7. **添加时间系统** - 实现昼夜循环或时间限制
-8. **添加成就系统** - 追踪玩家的成就和里程碑
+4. **添加保存/加载功能** - 实现游戏进度的保存和恢复
+5. **添加物品组合** - 允许物品之间的组合和使用
+6. **添加时间系统** - 实现昼夜循环或时间限制
+7. **添加成就系统** - 追踪玩家的成就和里程碑
+8. **添加多结局** - 根据玩家选择提供不同的游戏结局
 
-## 技术要点
-
-本项目使用的 Java SE 知识点：
-
-- 面向对象编程（OOP）
-- 类和对象
-- 继承和多态
-- 枚举类型
-- 集合框架（List, Map）
-- 异常处理
-- 输入/输出（Scanner）
-- 字符串处理
-- 包管理
-
-## Windows 常见问题
+## 常见问题
 
 ### 中文乱码问题
 
-如果在Windows系统上运行游戏时出现中文乱码，请按以下步骤解决：
+如果出现中文乱码，请使用提供的 `run_game.bat` 脚本，它已自动配置 UTF-8 编码。
 
-**方案1：使用提供的脚本（推荐）**
+### 推荐使用 Windows Terminal
 
-直接运行 `run.bat`，脚本已经自动配置了UTF-8编码。
+Windows Terminal 对 UTF-8 支持更好，推荐使用（Windows 10/11 自带）。
 
-**方案2：手动设置编码**
+### JDBC 驱动下载失败
 
-如果仍有问题，请在命令行中执行：
+如果自动下载失败，可以手动下载：
+1. 访问：https://dev.mysql.com/downloads/connector/j/
+2. 下载 `mysql-connector-j-8.x.x.jar`
+3. 放到项目根目录
+
+### 数据库连接失败
+
+检查以下几点：
+1. MySQL 服务是否启动
+2. `db.properties` 中的密码是否正确
+3. 服务器地址和端口是否正确
+4. 用户是否有远程连接权限（如果 MySQL 在其他机器上）
+
+### 无法创建数据库
+
+如果程序无法自动创建数据库，请手动执行：
 
 ```cmd
-# 设置控制台为UTF-8编码
-chcp 65001
-
-# 编译（指定UTF-8编码）
-javac -encoding UTF-8 -d bin -sourcepath src src\com\textadventure\game\DemoGame.java
-
-# 运行（指定UTF-8编码）
-java -Dfile.encoding=UTF-8 -cp bin com.textadventure.game.DemoGame
-```
-
-**方案3：使用Windows Terminal**
-
-推荐使用 Windows Terminal（Windows 10/11自带），它对UTF-8支持更好：
-1. 打开 Windows Terminal
-2. 运行 `run.bat`
-
-**方案4：修改控制台字体**
-
-如果使用传统cmd，请：
-1. 右键点击cmd窗口标题栏
-2. 选择"属性" → "字体"
-3. 选择支持中文的字体（如"新宋体"或"Microsoft YaHei Mono"）
-
-### PowerShell 用户
-
-如果使用PowerShell，可以直接运行：
-
-```powershell
-# 设置输出编码
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-
-# 运行游戏
-.\run.bat
+mysql -u root -p -e "CREATE DATABASE gameengine DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 ```
 
 ## 许可证
